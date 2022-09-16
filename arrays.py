@@ -57,6 +57,9 @@ class MenuAbstract:
     def serve(self) -> None:
         raise NotImplementedError
 
+    def use_option(self, option_key: Any) -> None:
+        raise NotImplementedError
+
     def serve_forever(self) -> NoReturn:
         while True:
             try:
@@ -86,6 +89,9 @@ class Menu(MenuAbstract):
     def get_options(self) -> list[Callable]:
         return self._options
 
+    def use_option(self, option_id: int) -> None:
+        self.get_options()[option_id](self.arrays_manager)
+
     def render_options(self, renderer: OptionsRenderer = None) -> list[str]:
         renderer = renderer or self.renderer
         return renderer.render(self.get_options())
@@ -99,7 +105,7 @@ class Menu(MenuAbstract):
         choice: int = int(input('\n')) - 1
 
         print('')
-        self._options[choice].execute(self.arrays_manager)
+        self._options[choice](self.arrays_manager)
         print('')
 
 
@@ -113,7 +119,7 @@ class OptionMetaclass(type):
 
 
 class Option:
-    def execute(self, array_cls: ArraysManagerAbstract) -> Any:
+    def __call__(self, array_cls: ArraysManagerAbstract) -> Any:
         raise NotImplementedError
 
     @property
@@ -124,7 +130,7 @@ class Option:
 class ShowArrays(Option, metaclass=OptionMetaclass):
     description: str = 'Показать массивы'
 
-    def execute(self, arrays_manager: ArraysManagerAbstract) -> None:
+    def __call__(self, arrays_manager: ArraysManagerAbstract) -> None:
         for array in arrays_manager.all():
             print(array)
 
@@ -132,7 +138,7 @@ class ShowArrays(Option, metaclass=OptionMetaclass):
 class AddArray(Option, metaclass=OptionMetaclass):
     description: str = 'Добавить массив'
 
-    def execute(self, arrays_manager: ArraysManagerAbstract) -> list:
+    def __call__(self, arrays_manager: ArraysManagerAbstract) -> list:
         array: list = arrays_manager.create()
 
         inp = input('Введите число, чтобы добавить его в массив, или напишите "стоп", чтобы закончить ввод\n')
@@ -142,11 +148,13 @@ class AddArray(Option, metaclass=OptionMetaclass):
                 array.append(int(i))
             inp = input()
 
+        return array
+
 
 class DeleteArray(Option, metaclass=OptionMetaclass):
     description: str = 'Удалить массив'
 
-    def execute(self, arrays_manager: ArraysManagerAbstract) -> None:
+    def __call__(self, arrays_manager: ArraysManagerAbstract) -> None:
         array_id = int(input('Введите номер массива, который вы хотите удалить\n')) - 1
         arrays_manager.delete(array_id)
 
@@ -154,7 +162,7 @@ class DeleteArray(Option, metaclass=OptionMetaclass):
 class ProcessArrays(Option, metaclass=OptionMetaclass):
     description: str = 'Обработать массивы'
 
-    def execute(self, arrays_manager: ArraysManagerAbstract) -> None:
+    def __call__(self, arrays_manager: ArraysManagerAbstract) -> None:
         if arrays_manager.is_last_elems_equal():
             for array in arrays_manager.get_arrays_with_max_elems_sum():
                 array.sort()

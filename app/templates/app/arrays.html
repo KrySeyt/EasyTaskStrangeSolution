@@ -1,0 +1,23 @@
+{% if arrays %}
+    <form method="post" action="{% url 'save-changes' %}">
+        {% csrf_token %}
+
+        {% for array in arrays %}
+            <div class="d-flex">
+                <input class="form-control me-2" type="search" value="{{ array|join:', ' }}"
+                       aria-label="Search" name="array"
+                        {% if not mutable %}
+                       disabled
+                        {% endif %}
+                >
+                <a type="button" href="{% url 'delete-array' forloop.counter0 %}">
+                    <button type="button" class="btn-close" aria-label="Close"></button>
+                </a>
+            </div>
+        {% endfor %}
+        <br>
+        {% if mutable %}
+            <button class="btn btn-outline-success" type="submit">Сохранить изменения</button>
+        {% endif %}
+    </form>
+{% endif %}

@@ -2,30 +2,39 @@ from typing import Generator, Callable, TypedDict, Mapping, Any, Container, Iter
 
 
 class ArraysManagerAbstract:
-    def __init__(self):
-        self._objects: list[list] = list()
-
     def create(self) -> list:
         raise NotImplementedError
 
     def delete(self, array_id: int) -> None:
         raise NotImplementedError
 
-    def all(self) -> list[list]:
+    def objects(self) -> list[list]:
         raise NotImplementedError
 
 
 class ArraysManager(ArraysManagerAbstract):
-    def create(self):
-        lst: list = list()
+    def __init__(self):
+        self._objects: list[list] = list()
+
+    def create(self, lst: list = None):
+        lst: list = lst or list()
         self._objects.append(lst)
         return lst
 
     def delete(self, array_id: int):
         del self._objects[array_id]
 
-    def all(self) -> list[list]:
+    @property
+    def objects(self) -> list[list]:
         return self._objects
+
+    @objects.setter
+    def objects(self, a) -> None:
+        raise AttributeError('You can not set this attribute')
+
+    @objects.deleter
+    def objects(self) -> None:
+        raise AttributeError('You can not delete this attribute')
 
     def is_last_elems_equal(self) -> bool:
         arrays_last_elems: set = set()
@@ -40,7 +49,7 @@ class ArraysManager(ArraysManagerAbstract):
                 yield array
 
     def get_arrays_with_max_elems_sum(self) -> Generator:
-        arrays = self.all()
+        arrays = self.objects
         max_elems_sum = sum(arrays[0])
 
         for array in arrays[1:]:
@@ -131,7 +140,7 @@ class ShowArrays(Option, metaclass=OptionMetaclass):
     description: str = 'Показать массивы'
 
     def __call__(self, arrays_manager: ArraysManagerAbstract) -> None:
-        for array in arrays_manager.all():
+        for array in arrays_manager.objects:
             print(array)
 
 

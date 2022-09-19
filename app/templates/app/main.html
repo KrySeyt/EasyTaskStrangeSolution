@@ -1,0 +1,23 @@
+{% extends 'app/base.html' %}
+
+{% load arrays %}
+
+{% block body %}
+    <div class="w-50 position-absolute top-50 start-50 translate-middle">
+        <form class="d-flex" action="{% url 'add-array' %}" method="post">
+            {% csrf_token %}
+            <input class="form-control me-2" type="search" placeholder="1, 2, 3..." value=""
+                   aria-label="Search" name="new-array">
+            <button class="btn btn-outline-success" type="submit">Добавить</button>
+        </form>
+
+        {% show_arrays mutable=1 %}
+
+        <br>
+        <div class="position-relative start-50 translate-middle-x">
+            <a type="button" href="{% url 'process-arrays' %}">
+                <button class="btn btn-outline-success" type="submit">Преобразовать</button>
+            </a>
+        </div>
+    </div>
+{% endblock body %}

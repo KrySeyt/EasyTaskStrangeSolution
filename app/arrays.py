@@ -191,7 +191,7 @@ class RendererToStrs(OptionsRenderer):
 
 
 class ConsoleOutput(OptionsOutput):
-    def show(self, options: Iterable):
+    def show(self, options: Iterable[str]):
         for i in options:
             print(i)
 

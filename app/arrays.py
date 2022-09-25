@@ -1,4 +1,4 @@
-from typing import Generator, Callable, TypedDict, Mapping, Any, Container, Iterable, NoReturn
+from typing import Generator, Callable, Any, Iterable, NoReturn
 
 
 class ArraysManagerAbstract:
@@ -8,6 +8,7 @@ class ArraysManagerAbstract:
     def delete(self, array_id: int) -> None:
         raise NotImplementedError
 
+    @property
     def objects(self) -> list[list]:
         raise NotImplementedError
 
@@ -171,7 +172,7 @@ class DeleteArray(Option, metaclass=OptionMetaclass):
 class ProcessArrays(Option, metaclass=OptionMetaclass):
     description: str = 'Обработать массивы'
 
-    def __call__(self, arrays_manager: ArraysManagerAbstract) -> None:
+    def __call__(self, arrays_manager: ArraysManager) -> None:
         if arrays_manager.is_last_elems_equal():
             for array in arrays_manager.get_arrays_with_max_elems_sum():
                 array.sort()

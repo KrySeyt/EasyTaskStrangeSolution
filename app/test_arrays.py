@@ -1,4 +1,5 @@
 import unittest
+from typing import Generator
 from unittest.mock import MagicMock, patch, PropertyMock
 
 from app import arrays
@@ -76,8 +77,10 @@ class TestArraysManager(unittest.TestCase):
                 [15, 5, 8],
                 [1, 0, 1],
             ])
-            for array in self.manager.get_arrays_with_max_elems_sum():
-                print(array)
+
+            gen: Generator = self.manager.get_arrays_with_max_elems_sum()
+
+            self.assertEqual(next(gen), [15, 5, 8])
 
 
 if __name__ == '__main__':

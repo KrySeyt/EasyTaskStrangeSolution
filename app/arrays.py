@@ -1,5 +1,3 @@
-from copy import deepcopy
-from numbers import Number
 from typing import Generator, Callable, Any, Iterable, NoReturn
 
 
@@ -11,24 +9,24 @@ class ArraysManagerAbstract:
         raise NotImplementedError
 
     @property
-    def objects(self) -> list[list[Number]]:
+    def objects(self) -> list[list]:
         raise NotImplementedError
 
 
 class ArraysManager(ArraysManagerAbstract):
     def __init__(self):
-        self._objects: list[list[Number]] = list()
+        self._objects: list[list] = list()
 
-    def create(self, lst: list = None) -> list:
+    def create(self, lst: list = None):
         lst: list = lst or list()
         self._objects.append(lst)
         return lst
 
-    def delete(self, array_id: int) -> None:
+    def delete(self, array_id: int):
         del self._objects[array_id]
 
     @property
-    def objects(self) -> list[list[Number]]:
+    def objects(self) -> list[list]:
         return self._objects
 
     @objects.setter
@@ -52,11 +50,17 @@ class ArraysManager(ArraysManagerAbstract):
                 yield array
 
     def get_arrays_with_max_elems_sum(self) -> Generator:
-        arrays_with_sums: dict = dict(zip(map(sum, self.objects), self.objects))
-        max_sum_arrays: filter = filter(lambda item: item[0] == max(arrays_with_sums.keys()),
-                                        arrays_with_sums.items())
-        for array_sum, array in max_sum_arrays:
-            yield array
+        arrays = self.objects
+        max_elems_sum = sum(arrays[0])
+
+        for array in arrays[1:]:
+            array_sum = sum(array)
+            if array_sum > max_elems_sum:
+                max_elems_sum = array_sum
+
+        for array in arrays:
+            if sum(array) == max_elems_sum:
+                yield array
 
 
 class MenuAbstract:

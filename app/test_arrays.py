@@ -1,6 +1,7 @@
 import unittest
+from functools import partial
 from typing import Generator
-from unittest.mock import MagicMock, patch, PropertyMock
+from unittest.mock import patch
 
 from app import arrays
 
@@ -8,6 +9,7 @@ from app import arrays
 class TestArraysManager(unittest.TestCase):
     def setUp(self) -> None:
         self.manager = arrays.ArraysManager()
+        self.mock_objects = partial(patch.object, self.manager, '_objects')
 
     def test_objects(self):
         with self.assertRaises(AttributeError):
@@ -17,7 +19,7 @@ class TestArraysManager(unittest.TestCase):
             del self.manager.objects
 
     def test_create(self):
-        with patch.object(self.manager, '_objects', new=list()):
+        with self.mock_objects(list()):
             obj_count: int = len(self.manager.objects)
             array: list
 
@@ -26,7 +28,7 @@ class TestArraysManager(unittest.TestCase):
             self.assertIs(self.manager.objects[-1], array)
 
     def test_delete(self):
-        with patch.object(self.manager, '_objects', new=[
+        with self.mock_objects([
             list(),
             list(),
             list(),
@@ -41,7 +43,7 @@ class TestArraysManager(unittest.TestCase):
             self.assertEqual(self.manager.objects, [list()])
 
     def test_is_last_elems_equal(self):
-        with patch.object(self.manager, '_objects', new=[]) as mocked_objects:
+        with self.mock_objects(list()) as mocked_objects:
             mocked_objects.extend([
                 [1, 2, 3],
                 [0, 4, 3],
@@ -60,23 +62,21 @@ class TestArraysManager(unittest.TestCase):
             self.assertFalse(self.manager.is_last_elems_equal())
 
     def test_get_arrays_with_last_elem_gt_len(self):
-        with patch.object(self.manager, '_objects', new=[]) as mocked_objects:
-            mocked_objects.extend([
-                [1, 3, 10],
-                [15, 5, 8],
-                [1, 0, 1],
-            ])
+        with self.mock_objects([
+            [1, 3, 10],
+            [15, 5, 8],
+            [1, 0, 1],
+        ]):
 
             for array in self.manager.get_arrays_with_last_elem_gt_len():
                 self.assertGreater(array[-1], len(array))
 
     def test_get_arrays_with_max_elems_sum(self):
-        with patch.object(self.manager, '_objects', new=[]) as mocked_objects:
-            mocked_objects.extend([
-                [1, 3, 10],
-                [15, 5, 8],
-                [1, 0, 1],
-            ])
+        with self.mock_objects([
+            [1, 3, 10],
+            [15, 5, 8],
+            [1, 0, 1],
+        ]):
 
             gen: Generator = self.manager.get_arrays_with_max_elems_sum()
 

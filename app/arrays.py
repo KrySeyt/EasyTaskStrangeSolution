@@ -1,4 +1,3 @@
-from copy import deepcopy
 from numbers import Number
 from typing import Generator, Callable, Any, Iterable, NoReturn
 
@@ -111,7 +110,7 @@ class Menu(MenuAbstract):
         choice: int = int(input('\n')) - 1
 
         print('')
-        self._options[choice](self.arrays_manager)
+        self.use_option(choice)
         print('')
 
 
